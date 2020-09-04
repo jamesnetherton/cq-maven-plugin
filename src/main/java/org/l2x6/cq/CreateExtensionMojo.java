@@ -193,7 +193,6 @@ public class CreateExtensionMojo extends AbstractMojo {
      * These are the template files you may want to provide under your custom {@link #templatesUriBase}:
      * <ul>
      * <li>{@code deployment-pom.xml}</li>
-     * <li>{@code integration-test-application.properties}</li>
      * <li>{@code integration-test-pom.xml}</li>
      * <li>{@code IT.java}</li>
      * <li>{@code parent-pom.xml}</li>
@@ -586,11 +585,6 @@ public class CreateExtensionMojo extends AbstractMojo {
         final Path itestPomPath = itestDir.resolve("pom.xml");
         evalTemplate(cfg, "integration-test-pom.xml", itestPomPath, model.build());
         PomSorter.updateMvndRules(basePath, itestPomPath, PomSorter.findExtensionArtifactIds(basePath, extensionDirs), false);
-
-        if (nativeSupported) {
-            evalTemplate(cfg, "integration-test-application.properties",
-                    itestDir.resolve("src/main/resources/application.properties"), model.build());
-        }
 
         final String artifactIdBaseCapCamelCase = CqUtils.toCapCamelCase(model.getArtifactIdBase());
         final Path testResourcePath = itestDir.resolve("src/main/java/" + model.getJavaPackageBasePath()
