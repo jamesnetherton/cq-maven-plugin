@@ -155,10 +155,11 @@ public class PromoteExtensionMojo extends AbstractMojo {
         /* Adjust the names in the test POM */
         adjustTestPom(artifactIdBase, destItestDir.resolve("pom.xml"), charset, templatesUriBase, simpleElementWhitespace);
 
-        /* Add the test module to its new parent module */
+        /* Add the test module to its new parent module and remove the maven.deploy.skip property */
         final Path integrationTestsPomPath = sourceRootPath.resolve("integration-tests/pom.xml");
         new PomTransformer(integrationTestsPomPath, charset, simpleElementWhitespace)
-                .transform(Transformation.addModule(artifactIdBase));
+                .transform(Transformation.addModule(artifactIdBase),
+                        Transformation.removeProperty(true, true, "maven.deploy.skip"));
         PomSorter.sortModules(integrationTestsPomPath);
 
         /* Move the extension */

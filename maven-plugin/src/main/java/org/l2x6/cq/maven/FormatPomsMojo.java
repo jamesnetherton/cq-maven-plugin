@@ -104,6 +104,14 @@ public class FormatPomsMojo extends AbstractExtensionListMojo {
     List<DirectoryScanner> updateVirtualDependenciesAllExtensions;
 
     /**
+     * A FileSet to add Maven property maven.deploy.skip into.
+     *
+     * @since 4.9.0
+     */
+    @Parameter
+    FileSet mavenDeploySkip;
+
+    /**
      * Skip the execution of this mojo.
      *
      * @since 0.0.1
@@ -241,6 +249,8 @@ public class FormatPomsMojo extends AbstractExtensionListMojo {
             }
         }
 
+        addMavenDeploySkipProperty(mavenDeploySkip, getCharset(), simpleElementWhitespace);
+
     }
 
     public static Transformation updateTestVirtualDependencies(final Predicate<Gavtcs> isExtension) {
@@ -312,6 +322,20 @@ public class FormatPomsMojo extends AbstractExtensionListMojo {
                     final Path pomXmlPath = base.resolve(pomXmlRelPath);
                     CqCommonUtils.updateVirtualDependencies(charset, simpleElementWhitespace, allVirtualExtensions, pomXmlPath);
                 }
+            }
+        }
+    }
+
+    public static void addMavenDeploySkipProperty(FileSet mavenDeploySkip, Charset charset,
+            SimpleElementWhitespace simpleElementWhitespace) {
+        if (mavenDeploySkip != null && mavenDeploySkip.getDirectory() != null) {
+            final FileSetManager fileSetManager = new FileSetManager();
+            final Path dir = Paths.get(mavenDeploySkip.getDirectory());
+            final String[] includedFiles = fileSetManager.getIncludedFiles(mavenDeploySkip);
+            for (String includedFile : includedFiles) {
+                final Path pomXmlPath = dir.resolve(includedFile);
+                new PomTransformer(pomXmlPath, charset, simpleElementWhitespace)
+                        .transform(Transformation.addOrSetProperty("maven.deploy.skip", "true"));
             }
         }
     }
